@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Datos del País</title>
+</head>
+<body>
+    <h1>Consulta de Datos del País</h1>
+    <label for="pais">País:</label>
+    <input type="text" id="paisInput" placeholder="Escribe el nombre del país">
+    <button onclick="obtenerDatosDelPais()">Consultar</button>
+    <div id="resultado"></div>
+
+    <script>
+        function obtenerDatosDelPais() {
+            const pais = document.getElementById("paisInput").value;
+            const url = `/datos/${pais}`;
+
+            fetch(url)
+                .then(response => {
+                    if (response.status === 200) {
+                        return response.json();
+                    } else {
+                        throw new Error("País no encontrado.");
+                    }
+                })
+                .then(data => {
+                    const datos = data.datos;
+                    const poblacion = datos.poblacion.toFixed(0);
+                    const temperatura = datos.temperatura.toFixed(2) + "°C";
+                    const listaRep = datos.lista_rep;
+
+                    let listaRepHTML = "<ul>";
+                    for (const rep of listaRep) {
+                        listaRepHTML += `<li>Nombre: ${rep.nombre}, Autor: ${rep.autor}, Oyentes: ${rep.oyentes.toFixed(0)}</li>`;
+                    }
+                    listaRepHTML += "</ul>";
+
+                    const resultado = `Población: ${poblacion}<br>Temperatura: ${temperatura}<br>Listas de Reproducción:<br>${listaRepHTML}`;
+                    document.getElementById("resultado").innerHTML = resultado;
+                })
+                .catch(error => {
+                    document.getElementById("resultado").innerHTML = "Error: " + error.message;
+                });
+        }
+    </script>
+</body>
+</html>
